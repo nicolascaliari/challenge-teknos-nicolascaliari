@@ -79,7 +79,7 @@ const findAll = (req, res) => {
 //         res.json({ mensajesFiltrados });
 //         return;
 //     }
-   
+
 
 //     res.json({ data });
 // };
@@ -90,9 +90,9 @@ const filterMessages = (req, res) => {
     const { from, to, subject, folder } = req.query;
 
 
-    if(folder === null || folder === undefined){
+    if (folder === null || folder === undefined) {
         res.status(404).json({ message: 'Debes colocar un valor en folder' });
-        return; 
+        return;
     }
     db.query(`SELECT * FROM ${folder}`, (err, rows) => {
         if (err) {
@@ -150,79 +150,83 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 //-------------con json----------------
-const createMessage = (req, res) => {
-    const { dataJson , folder} = req.body;
-    const { file } = req;
+// const createMessage = (req, res) => {
+//     const { dataJson} = req.body;
+//     const { file } = req;
+//     const { folder } = req.params;
 
-    const dataParseada = JSON.parse(dataJson);
 
-    const folders = fs.readFileSync(path.join(__dirname, `../json/${folder}.json`), 'utf8');
 
-    const folderParseada = JSON.parse(folders);
+//     const dataParseada = JSON.parse(dataJson);
 
-    const data = folderParseada.data;
+//     const folders = fs.readFileSync(path.join(__dirname, `../json/${folder}.json`), 'utf8');
 
-    const formattedMessage = {
-        "id": idMessage,
-        "file": file ? file.path : null,
-        ...dataParseada
-    };
+//     const folderParseada = JSON.parse(folders);
 
-    data.push(formattedMessage);
-    fs.writeFileSync(path.join(__dirname, `../json/${folder}.json`), JSON.stringify({ data }, null, 2));
+//     const data = folderParseada.data;
 
-    res.json({ data });
-};
+//     const formattedMessage = {
+//         "id": idMessage,
+//         "file": file ? file.path : null,
+//         ...dataParseada
+//     };
+
+//     data.push(formattedMessage);
+//     fs.writeFileSync(path.join(__dirname, `../json/${folder}.json`), JSON.stringify({ data }, null, 2));
+
+//     res.json({ data });
+// };
 
 
 
 //-------------con mysql----------------
 
-// const createMessage = (req, res) => {
+const createMessage = (req, res) => {
 
-//     const { dataJson , folder} = req.body;
-//     const { file } = req;
+    const { dataJson } = req.body;
+    const { file } = req;
+    const { folder } = req.params;
 
-//     const newMessage = JSON.parse(dataJson);
+    const newMessage = JSON.parse(dataJson);
 
-//     const fromString = JSON.stringify(newMessage.from);
-//     const toString = JSON.stringify(newMessage.to);
-//     const attachmentsString = JSON.stringify(newMessage.attachments);
-//     const labelsString = JSON.stringify(newMessage.labels);
+    const fromString = JSON.stringify(newMessage.from);
+    const toString = JSON.stringify(newMessage.to);
+    const attachmentsString = JSON.stringify(newMessage.attachments);
+    const labelsString = JSON.stringify(newMessage.labels);
 
 
-//     const sql = `INSERT INTO ${folder} 
-//                  (id, file, from_data, to_data, subject, message, time, message_read, starred, important, hasAttachments, attachments, labels) 
-//                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO ${folder} 
+                 (id, file, from_data, to_data, subject, message, time, message_read, starred, important, hasAttachments, attachments, labels) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-//     db.query(
-//         sql,
-//         [
-//             idMessage,
-//             file.path,
-//             fromString,
-//             toString,
-//             newMessage.subject,
-//             newMessage.message,
-//             newMessage.time,
-//             newMessage.read,
-//             newMessage.starred,
-//             newMessage.important,
-//             newMessage.hasAttachments,
-//             attachmentsString,
-//             labelsString
-//         ],
-//         (error) => {
-//             if (error) {
-//                 res.status(500).json({ error: 'Error interno del servidor' });
-//                 console.error(error.message);
-//             } else {
-//                 res.json({ newMessage });
-//             }
-//         }
-//     );
+    db.query(
+        sql,
+        [
+            idMessage,
+            file.path,
+            fromString,
+            toString,
+            newMessage.subject,
+            newMessage.message,
+            newMessage.time,
+            newMessage.read,
+            newMessage.starred,
+            newMessage.important,
+            newMessage.hasAttachments,
+            attachmentsString,
+            labelsString
+        ],
+        (error) => {
+            if (error) {
+                res.status(500).json({ error: 'Error interno del servidor' });
+                console.error(error.message);
+            } else {
+                res.json({ newMessage });
+            }
+        }
+    );
 
-// };
+};
 
 
 

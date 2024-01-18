@@ -9,7 +9,7 @@ router.get('/folders', findAll);
 router.get('/messages', filterMessages);
 
 
-router.post('/messages/important', upload.single('file') ,  createMessage);
+router.post('/messages/:folder', upload.single('file') ,  createMessage);
 
 
 router.delete('/messages/important/:id', deleteMessage);
